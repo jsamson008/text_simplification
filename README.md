@@ -3,7 +3,7 @@ Deep Learning based Text Simplification
 
 # Steps
 
-1.  python anonymize.py data/Zhang_Lapata_Newsela_splits/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.test[.src/.dst]
+1.  python anonymize.py data/Zhang_Lapata_Newsela_splits/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.test
 
 2.  python preprocess.py -train_src ../text_simplification/new_data/train/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.train.src.aner -train_tgt ../text_simplification/new_data/train/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.train.dst.aner -valid_src ../text_simplification/new_data/valid/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.valid.src.aner -valid_tgt ../text_simplification/new_data/valid/V0V4_V1V4_V2V4_V3V4_V0V3_V0V2_V1V3.aner.ori.valid.dst.aner -save_data ../text_simplification/preprocess_data/data -share_vocab
 
