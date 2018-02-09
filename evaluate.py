@@ -1,6 +1,6 @@
 import json
 
-with open('rerank.json') as f:
+with open('data/new_data/test/dictionary_seq2seq_att.json') as f:
     data = json.load(f)
 
 bleu = 0

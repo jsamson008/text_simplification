@@ -96,7 +96,7 @@ for item in data:
         clus['candidates'][str(k)] = [{'val':cand[p], 'original_rank': p} for p in cluster[k]]
     clusters.append(clus)
 
-with open("cluster_" + str(num_cluster) + ".json", "w") as f:
+with open("cluster_seq2seq_att_" + str(num_cluster) + ".json", "w") as f:
     json.dump(clusters, f, sort_keys=True, indent=4)
 
 

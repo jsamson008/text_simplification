@@ -1,6 +1,7 @@
 import sys
 from pycorenlp import StanfordCoreNLP
 import json
+import re
 
 def process(complex_sent, simple_sent, nlp):
     complex_sent = complex_sent.decode("ascii", "ignore").encode("ascii", "ignore")
@@ -20,6 +21,7 @@ def process(complex_sent, simple_sent, nlp):
         for token in sent['tokens']:
             token['ner'] = "O" if (token['ner'] != "PERSON" and token['ner'] != "ORGANIZATION" and token['ner'] != "LOCATION") else token['ner']
             simple_tagged.append({"word": token['word'].lower(), "ner": token['ner']})
+    print(simple_tagged)
     complex_sent = []
     current_words = []
     current_type = ""
@@ -38,6 +40,13 @@ def process(complex_sent, simple_sent, nlp):
         else:
             current_words.append(token)
             current_type = token['ner']
+    if len(current_words) != 0:
+        entity = " ".join([w['word'] for w in current_words])
+        if current_type in cnt:
+            complex_sent.append({"word": entity, "ner": current_type, "cnt": cnt[current_type]})
+        else:
+            complex_sent.append({"word": entity, "ner": current_type, "cnt": 1})
+
     simple_sent = []
     current_words = []
     current_type = ""
@@ -55,6 +64,14 @@ def process(complex_sent, simple_sent, nlp):
         else:
             current_words.append(token)
             current_type = token['ner']
+    if len(current_words) != 0:
+        entity = " ".join([w['word'] for w in current_words])
+        if current_type in cnt:
+            simple_sent.append({"word": entity, "ner": current_type, "cnt": cnt[current_type]})
+        else:
+            simple_sent.append({"word": entity, "ner": current_type, "cnt": 1})
+            
+    print(simple_sent)
     entity_mapping = {}
     for token in complex_sent:
         if token['ner'] != "O":
@@ -85,6 +102,8 @@ def process(complex_sent, simple_sent, nlp):
             deanonymize[token["ner"] + "@" + str(entity_mapping[token["ner"]][token["word"]])] = token["word"]
     c = " ".join(c)
     s = " ".join(s)
+    print(c.encode("utf-8"))
+    print(s.encode("utf-8"))
     return c,s,deanonymize
 
 def anonymize(file_prefix):
@@ -92,8 +111,8 @@ def anonymize(file_prefix):
     '''
         Start a server using command: java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000
     '''
-    complex_file_name = file_prefix + ".complex"
-    simple_file_name = file_prefix + ".simple"
+    complex_file_name = file_prefix + ".src"
+    simple_file_name = file_prefix + ".dst"
     nlp = StanfordCoreNLP('http://localhost:9000')
 
     complex_lines = []
@@ -116,13 +135,15 @@ def anonymize(file_prefix):
     
     with open(complex_file_name + ".aner", "w") as f:
         for (c,_,_) in pair:
-            f.write(c.encode())
+            c = re.sub("r[^a-zA-Z0-9#\\/@,:; ]", "", c)
+            f.write(c.encode("utf-8"))
             f.write("\n")
     with open(simple_file_name + ".aner", "w") as f:
         for (_,s,_) in pair:
-            f.write(s.encode())
+            s = re.sub("r[^a-zA-Z0-9#\\/@,:; ]", "", s)
+            f.write(s.encode("utf-8"))
             f.write("\n")
-    with open(data_type + ".deanonymiser", "w") as f:
+    with open(file_prefix + ".deanonymiser", "w") as f:
         for (_,_,d) in pair:
             f.write(json.dumps(d))
             f.write("\n")
